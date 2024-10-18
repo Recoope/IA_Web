@@ -1,0 +1,63 @@
+cd Downloads
+
+chmod 400 "chave"
+--------------------------------------
+
+ssh -i "chave" ubuntu@ec2-54-81-132-236.compute-1.amazonaws.com
+
+---------------------------------------
+
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install -y python3
+sudo apt-get install -y python3-pip
+sudo apt-get install git
+
+----------------------------------------
+
+git clone https://github.com/HenriqueAlmeidaLucareli/Aws_pratica.git
+ 
+-----------------------------------------
+
+cd <arq_git>
+
+Ativar .ENV --------------------------------
+
+sudo apt-get install python3.12-venv
+python3 -m venv my_env
+source my_env/bin/activate
+
+pip3 install -r requirements.txt
+
+chmod 777 executar.sh
+chmod 777 iniciarApp.sh
+
+cd ..
+
+python app.py
+
+--Rodar automatico
+
+nano /home/ubuntu/start_script.sh
+
+#!/bin/bash
+cd /home/ubuntu/Aws_pipeline               # Muda para o diretório Aws_pipeline
+source my_env/bin/activate                  # Ativa o ambiente virtual
+exec python3 app.py                         # Executa o script Python
+
+chmod +x /home/ubuntu/start_script.sh
+
+crontab -e
+
+1
+
+@reboot /home/ubuntu/start_script.sh
+
+
+
+
+
+
+
+
+

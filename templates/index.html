@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Predição de Atividade</title>
+
+    <!-- CSS interno -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-image: url("imagem.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+
+      h1 {
+        background-color: #4EB369;
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+        font-size: 2.5em;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      form {
+        background-color: #fff;
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      label {
+        font-weight: bold;
+        color: #4EB369;
+        margin-top: 10px;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        transition: border 0.3s;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus {
+        border-color: #4EB369;
+        outline: none;
+      }
+
+      button {
+        background-color: #4EB369;
+        color: white;
+        padding: 15px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.2em;
+        width: 100%;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #4EB369;
+      }
+
+      #resultado-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      #resultado {
+        text-align: center;
+        font-size: 1.5em;
+        margin-top: 10px;
+        color: #4EB369;
+      }
+
+      button:disabled {
+        background-color: #9e9e9e;
+        cursor: not-allowed;
+      }
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      form,
+      h1,
+      #resultado-container {
+        animation: fade-in 1s ease-in-out;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Predição de Atividade da Empresa</h1>
+
+    <form id="predictForm">
+      <label for="razao_social">Razão Social:</label>
+      <input type="text" id="razao_social" name="razao_social" required />
+
+      <label for="estado">Estado:</label>
+      <input type="text" id="estado" name="estado" required />
+
+      <label for="municipio">Município:</label>
+      <input type="text" id="municipio" name="municipio" required />
+
+      <label for="ano">Ano:</label>
+      <input type="number" id="ano" name="ano" required min="2000" max=/>
+
+      <label for="tipo_residuo">Tipo de Resíduo:</label>
+      <input type="text" id="tipo_residuo" name="tipo_residuo" required />
+
+      <label for="metodo_reciclagem">Método de Reciclagem:</label>
+      <input
+        type="text"
+        id="metodo_reciclagem"
+        name="metodo_reciclagem"
+        required
+      />
+
+      <label for="quantidade">Quantidade:</label>
+      <input type="number" id="quantidade" name="quantidade" required min="0" />
+
+      <!-- <label for="unidade_medida">Unidade de Medida:</label>
+      <input type="text" id="unidade_medida" name="unidade_medida" required /> -->
+
+      <label for="empresa_destinadora">Empresa Destinadora do Resíduo:</label>
+      <input
+        type="text"
+        id="empresa_destinadora"
+        name="empresa_destinadora"
+        required
+      />
+
+      <button type="submit">Fazer Previsão</button>
+    </form>
+
+    <div id="resultado-container">
+      <h2>Resultado da Previsão</h2>
+      <div id="resultado"></div>
+    </div>
+
+    <!-- JavaScript interno -->
+    <script>
+      // Obter o ano atual
+      const anoAtual = new Date().getFullYear();
+      
+      // Definir o atributo max do campo de ano
+      document.getElementById("ano").setAttribute("max", anoAtual);
+      
+      document.getElementById("predictForm").onsubmit = function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {};
+
+        formData.forEach((value, key) => {
+          data[key] = value;
+        });
+
+        const resultadoElement = document.getElementById("resultado");
+        const resultadoContainer = document.getElementById(
+          "resultado-container"
+        );
+        const submitButton = this.querySelector("button");
+
+        submitButton.disabled = true;
+        submitButton.innerText = "Carregando...";
+
+        resultadoElement.innerHTML =
+          '<img src="https://i.imgur.com/llF5iyg.gif" alt="Carregando..." style="width: 50px;">';
+        resultadoContainer.style.display = "block";
+
+        setTimeout(() => {
+          fetch("/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams(data),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              resultadoElement.innerHTML = "Resultado: " + data.resultado;
+              submitButton.disabled = false;
+              submitButton.innerText = "Fazer Previsão";
+            })
+            .catch((error) => {
+              console.error("Erro:", error);
+              resultadoElement.innerHTML = "Ocorreu um erro. Tente novamente.";
+              submitButton.disabled = false;
+              submitButton.innerText = "Fazer Previsão";
+            });
+        }, 1500);
+      };
+    </script>
+  </body>
+</html>
