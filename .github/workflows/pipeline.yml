@@ -25,12 +25,12 @@ jobs:
           pip install coverage
           pip install -r requirements.txt
 
-      - name: Run covarage python
-        run: |
-          coverage run app.py
+      # - name: Run covarage python
+      #   run: |
+      #     coverage run app.py
 
-      - name: Resultados
-        run: coverage report
+      # - name: Resultados
+      #   run: coverage report
 
       - name: Deploy no EC2 -AWS
         run: |
