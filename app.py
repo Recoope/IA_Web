@@ -57,7 +57,7 @@ def predict():
         engine = create_engine("postgresql+psycopg://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/IA?sslmode=require")
 
         # Salvar o DataFrame no banco de dados
-        df.to_sql('Respostas', con=engine, if_exists='replace', index=False)
+        df.to_sql('Respostas', con=engine, if_exists='append', index=False)
 
         print("DataFrame salvo com sucesso!")
 
@@ -71,4 +71,4 @@ def predict():
     return jsonify({'resultado': resultado[0]})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
