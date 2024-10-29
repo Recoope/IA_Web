@@ -1,193 +1,241 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Predição de Atividade</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-image: url("imagem.jpg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      color: #333;
-      margin: 0;
-      padding: 0;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/static/images/favicon.ico"
+    />
 
-    h1 {
-      background-color: #4EB369;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-      font-size: 2.5em;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+    <title>Predição de Atividade</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
 
-    form {
-      background-color: #fff;
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
+      h1 {
+        background-color: #4eb369;
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+        font-size: 2.5em;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
 
-    label {
-      font-weight: bold;
-      color: #4EB369;
-      margin-top: 10px;
-    }
+      form {
+        background-color: #fff;
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
 
-    input[type="text"],
-    input[type="number"],
-    select {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
-      transition: border 0.3s;
-    }
+      label {
+        font-weight: bold;
+        color: #4eb369;
+        margin-top: 10px;
+      }
 
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    select:focus {
-      border-color: #4EB369;
-      outline: none;
-    }
+      input[type="text"],
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        transition: border 0.3s;
+      }
 
-    button {
-      background-color: #4EB369;
-      color: white;
-      padding: 15px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1.2em;
-      width: 100%;
-      transition: background-color 0.3s;
-    }
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      select:focus {
+        border-color: #4eb369;
+        outline: none;
+      }
 
-    button:hover {
-      background-color: #4EB369;
-    }
+      button {
+        background-color: #4eb369;
+        color: white;
+        padding: 15px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.2em;
+        width: 100%;
+        transition: background-color 0.3s;
+      }
 
-    #resultado-container {
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      display: none;
-    }
+      button:hover {
+        background-color: #4eb369;
+      }
 
-    #resultado {
-      text-align: center;
-      font-size: 1.5em;
-      margin-top: 10px;
-      color: #4EB369;
-    }
+      #resultado-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
 
-    button:disabled {
-      background-color: #9e9e9e;
-      cursor: not-allowed;
-    }
-  </style>
-</head>
-<body>
-  <h1>Predição de Atividade da Empresa</h1>
+      #resultado {
+        text-align: center;
+        font-size: 1.5em;
+        margin-top: 10px;
+        color: #4eb369;
+      }
 
-  <form id="predictForm">
-    <label for="estado">Estado:</label>
-    <select name="estado" id="estado" required>
-      {% for residuo in estado %}
+      button:disabled {
+        background-color: #9e9e9e;
+        cursor: not-allowed;
+      }
+    </style>
+    <!-- Importação do jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <h1>Predição de Atividade da Empresa</h1>
+
+    <form id="predictForm">
+      <label for="estado">Estado:</label>
+      <select name="estado" id="estado" required>
+        {% for residuo in estado %}
         <option value="{{ residuo }}">{{ residuo }}</option>
-      {% endfor %}
-    </select>
+        {% endfor %}
+      </select>
 
-    <label for="municipio">Município:</label>
-    <select name="municipio" id="municipio" required>
-      {% for residuo in municipio %}
+      <label for="municipio">Município:</label>
+      <select name="municipio" id="municipio" required>
+        <option value="">Selecione um município</option>
+      </select>
+
+      <label for="ano">Ano:</label>
+      <input type="number" id="ano" name="ano" required min="2000" />
+
+      <label for="tipo_residuo">Tipo de Resíduo:</label>
+      <select name="tipo_residuo" id="tipo_residuo" required>
+        {% for residuo in tipo %}
         <option value="{{ residuo }}">{{ residuo }}</option>
-      {% endfor %}
-    </select>
+        {% endfor %}
+      </select>
 
-    <label for="ano">Ano:</label>
-    <input type="number" id="ano" name="ano" required min="2000" />
-
-    <label for="tipo_residuo">Tipo de Resíduo:</label>
-    <select name="tipo_residuo" id="tipo_residuo" required>
-      {% for residuo in tipo %}
+      <label for="metodo_reciclagem">Método de Reciclagem:</label>
+      <select name="metodo_reciclagem" id="metodo_reciclagem" required>
+        {% for residuo in metodo_reciclagem %}
         <option value="{{ residuo }}">{{ residuo }}</option>
-      {% endfor %}
-    </select>
+        {% endfor %}
+      </select>
 
-    <label for="metodo_reciclagem">Método de Reciclagem:</label>
-    <select name="metodo_reciclagem" id="metodo_reciclagem" required>
-      {% for residuo in metodo_reciclagem %}
-        <option value="{{ residuo }}">{{ residuo }}</option>
-      {% endfor %}
-    </select>
+      <label for="quantidade">Quantidade em Kilos:</label>
+      <input type="number" id="quantidade" name="quantidade" required min="0" />
 
-    <label for="quantidade">Quantidade em Kilos:</label>
-    <input type="number" id="quantidade" name="quantidade" required min="0" />
+      <button type="submit">Fazer Previsão</button>
+    </form>
 
-    <button type="submit">Fazer Previsão</button>
-  </form>
+    <div id="resultado-container">
+      <h2>Resultado da Previsão</h2>
+      <div id="resultado"></div>
+    </div>
 
-  <div id="resultado-container">
-    <h2>Resultado da Previsão</h2>
-    <div id="resultado"></div>
-  </div>
+    <script>
+      $(document).ready(function () {
+        function atualizarMunicipios() {
+          var estadoSelecionado = $("#estado").val();
 
-  <script>
-    const anoAtual = new Date().getFullYear();
-    document.getElementById("ano").setAttribute("max", anoAtual);
+          if (estadoSelecionado) {
+            $.ajax({
+              url: "/get_municipios",
+              type: "POST",
+              contentType: "application/json",
+              data: JSON.stringify({ estado: estadoSelecionado }),
+              success: function (response) {
+                var municipioSelect = $("#municipio");
+                municipioSelect.empty();
 
-    document.getElementById("predictForm").onsubmit = function (e) {
-      e.preventDefault();
+                municipioSelect.append(
+                  '<option value="">Selecione um município</option>'
+                );
+                response.forEach(function (municipio) {
+                  municipioSelect.append(
+                    '<option value="' +
+                      municipio +
+                      '">' +
+                      municipio +
+                      "</option>"
+                  );
+                });
+              },
+              error: function () {
+                alert("Erro ao carregar municípios.");
+              },
+            });
+          } else {
+            $("#municipio")
+              .empty()
+              .append('<option value="">Selecione um município</option>');
+          }
+        }
 
-      const formData = new FormData(this);
-      const data = {};
+        $("#estado").change(atualizarMunicipios);
 
-      formData.forEach((value, key) => {
-        data[key] = value;
+        const anoAtual = new Date().getFullYear();
+        document.getElementById("ano").setAttribute("max", anoAtual);
+
+        document.getElementById("predictForm").onsubmit = function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+          const data = {};
+
+          formData.forEach((value, key) => {
+            data[key] = value;
+          });
+
+          const resultadoElement = document.getElementById("resultado");
+          const resultadoContainer = document.getElementById(
+            "resultado-container"
+          );
+          const submitButton = this.querySelector("button");
+
+          submitButton.disabled = true;
+          submitButton.innerText = "Carregando...";
+          resultadoElement.innerHTML =
+            '<img src="https://i.imgur.com/llF5iyg.gif" alt="Carregando..." style="width: 50px;">';
+          resultadoContainer.style.display = "block";
+
+          fetch("/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams(data),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              resultadoElement.innerHTML = "Resultado: " + data.resultado;
+              submitButton.disabled = false;
+              submitButton.innerText = "Fazer Previsão";
+            })
+            .catch((error) => {
+              console.error("Erro:", error);
+              resultadoElement.innerHTML = "Ocorreu um erro. Tente novamente.";
+              submitButton.disabled = false;
+              submitButton.innerText = "Fazer Previsão";
+            });
+        };
       });
-
-      const resultadoElement = document.getElementById("resultado");
-      const resultadoContainer = document.getElementById("resultado-container");
-      const submitButton = this.querySelector("button");
-
-      submitButton.disabled = true;
-      submitButton.innerText = "Carregando...";
-
-      resultadoElement.innerHTML = '<img src="https://i.imgur.com/llF5iyg.gif" alt="Carregando..." style="width: 50px;">';
-      resultadoContainer.style.display = "block";
-
-      fetch("/predict", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams(data),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          resultadoElement.innerHTML = "Resultado: " + data.resultado;
-          submitButton.disabled = false;
-          submitButton.innerText = "Fazer Previsão";
-        })
-        .catch((error) => {
-          console.error("Erro:", error);
-          resultadoElement.innerHTML = "Ocorreu um erro. Tente novamente.";
-          submitButton.disabled = false;
-          submitButton.innerText = "Fazer Previsão";
-        });
-    };
-  </script>
-</body>
+    </script>
+  </body>
 </html>
