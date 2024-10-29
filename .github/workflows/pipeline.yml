@@ -41,5 +41,7 @@ jobs:
             git stash || exit
             git pull || exit
             cd python_flask/ || exit
+            chmod +x executar.sh || exit
+            chmod +x iniciarApp.sh || exit
             ./executar.sh || exit
             echo 'Implantação concluída com sucesso.'
