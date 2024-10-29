@@ -35,10 +35,12 @@ jobs:
       - name: Deploy no EC2 -AWS
         run: |
           echo "Conectando no EC2"
-          echo "${{secrets.AWS_CHAVE_PIPELINE_AWS_PEM}}" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ubuntu@"${{secrets.chave_ubuntu}}" "
-          cd IA_Web/ ||
-          git stash ||
-          git pull ||
-          cd python_flask/ ||
-          ./executar.sh ||"      
+          echo "${{ secrets.AWS_CHAVE_PIPELINE_AWS_PEM }}" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ubuntu@"${{ secrets.chave_ubuntu }}" << 'ENDSSH'
+            cd IA_Web/ || exit
+            git stash || exit
+            git pull || exit
+            cd python_flask/ || exit
+            chmod +x executar.sh || exit
+            ./executar.sh || exit
+            echo 'Implantação concluída com sucesso.'
