@@ -43,4 +43,4 @@ jobs:
             cd /home/ubuntu/RecoopeCompose/IA_Web
             git pull origin main
             cd ..
-            bash ./deploy.sh"
+            bash ./deploy.sh
