@@ -2,6 +2,8 @@ name: RPA de banco # nome do teste
 
 # trigger (gatilho)
 on: 
+  push:
+    branches: ["main"] # e qual a branch que vai gerar o gatilho (["*"] todas as branches)
   pull_request: # o que vai ativar esse gatilho
     branches: ["main"] # e qual a branch que vai gerar o gatilho (["*"] todas as branches)
 
@@ -33,15 +35,12 @@ jobs:
       #   run: coverage report
 
       - name: Deploy no EC2 -AWS
+        if: github.event_name == 'push'
         run: |
           echo "Conectando no EC2"
           echo "${{ secrets.AWS_CHAVE_PIPELINE_AWS_PEM }}" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ubuntu@"${{ secrets.chave_ubuntu }}" << 'ENDSSH'
-            cd IA_Web/ || exit
-            git stash || exit
-            git pull || exit
-            cd python_flask/ || exit
-            chmod +x executar.sh || exit
-            chmod +x iniciarApp.sh || exit
-            ./executar.sh || exit
-            echo 'Implantação concluída com sucesso.'
+            cd /home/ubuntu/RecoopeCompose/RPA_BANCO
+            git pull origin main
+            cd ..
+            bash ./deploy.sh"

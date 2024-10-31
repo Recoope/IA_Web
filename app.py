@@ -10,7 +10,7 @@ app = Flask(__name__)
 modelo = joblib.load('pipeline.pkl')
 
 # Carregar o DataFrame uma vez para reutilizá-lo nas rotas
-df = pd.read_excel('C:/Users/henriquelucareli-ieg/Desktop/Recoope/Tudo/Analise Exploratoria/base_empresas_reciclagem_IA.xlsx')
+df = pd.read_excel('base_empresas_reciclagem_IA.xlsx')
 
 @app.route('/')
 def home():
