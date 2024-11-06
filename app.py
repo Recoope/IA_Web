@@ -5,12 +5,27 @@ from sqlalchemy import create_engine
 import psycopg
 
 app = Flask(__name__)
+global_id = 1
 
 # Carregar o modelo previamente treinado
 modelo = joblib.load('pipeline.pkl')
 
 # Carregar o DataFrame uma vez para reutilizá-lo nas rotas
 df = pd.read_excel('base_empresas_reciclagem_IA.xlsx')
+
+# Função para obter o próximo ID
+def obter_proximo_id():
+    # Conexão com o banco de dados
+    conn = psycopg.connect("postgres://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/IA?sslmode=require")
+    cursor = conn.cursor()
+    
+    # Obter o último ID e adicionar 1
+    cursor.execute("SELECT COALESCE(MAX(id), 0) + 1 FROM \"Respostas\"")
+    proximo_id = cursor.fetchone()[0]
+    
+    # Fechar a conexão
+    conn.close()
+    return proximo_id
 
 @app.route('/')
 def home():
@@ -33,6 +48,7 @@ def get_municipios():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    id= obter_proximo_id()
     estado = request.form.get('estado')
     municipio = request.form.get('municipio')
     ano = request.form.get('ano')
@@ -43,11 +59,11 @@ def predict():
 
     # Preparar os dados para predição
     dados_entrada = [[
-        estado, municipio, ano, tipo_residuo,
+        id, estado, municipio, ano, tipo_residuo,
         metodo_reciclagem, quantidade, unidade_media
     ]]
 
-    colunas = ['Estado', 'Município', 'Ano', 'Tipo de Resíduo', 'Método de Reciclagem', 'Quantidade', 'Unidade de Medida']
+    colunas = ['id','Estado', 'Município', 'Ano', 'Tipo de Resíduo', 'Método de Reciclagem', 'Quantidade', 'Unidade de Medida']
     dados_entrada_df = pd.DataFrame(dados_entrada, columns=colunas)
 
     # Fazer a predição
@@ -77,6 +93,42 @@ def predict():
         conn.close()
 
     return jsonify({'resultado': resultado[0]})
+
+@app.route('/update_resposta', methods=['POST'])
+def update_resposta():
+    try:
+
+        # Lógica para atualização do status
+        conn = psycopg.connect("postgres://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/IA?sslmode=require")
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT MAX(id) FROM \"Respostas\"")
+        max_id = cursor.fetchone()[0]
+
+        if max_id:
+            cursor.execute("""
+                UPDATE \"Respostas\"
+                SET \"Resultado\" = CASE 
+                    WHEN \"Resultado\" = 'Ativa' THEN 'Encerrado' 
+                    WHEN \"Resultado\" = 'Encerrado' THEN 'Ativa' 
+                    ELSE \"Resultado\" 
+                END
+                WHERE id = %s
+            """, (max_id,))
+            
+            conn.commit()
+            return jsonify({'mensagem': 'Resposta confirmada com sucesso!'})
+
+        else:
+            return jsonify({'mensagem': 'Nenhum registro encontrado para atualização.'})
+
+    except Exception as e:
+        print(e)
+        return jsonify({'mensagem': f'Erro ao confirmar resposta: {e}'})
+    
+    finally:
+        conn.close()
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
